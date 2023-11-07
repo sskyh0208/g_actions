@@ -26,6 +26,16 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: GitHubActions-${{ github.run_id }}
 
+      - name: Create env file
+        working-directory: ./src/laravel
+        run: |
+          aws ssm get-parameter \
+          --with-decryption \
+          --name ${{ secrets.AWS_PARAMETER_STORE_ENV_FILE_NAME }} \
+          --query Parameter.Value | \
+          sed -e 's/^"//' -e 's/"$//' -e 's/\\\"/\"/g' | \
+          awk '{gsub(/\\n/,"\n")}1' > .env
+
       - name: Move to Laravel directory and install dependencies
         working-directory: ./src/laravel
         run: composer install --prefer-dist --no-interaction --optimize-autoloader
