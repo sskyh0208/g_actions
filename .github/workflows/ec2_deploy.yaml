@@ -72,6 +72,7 @@ jobs:
             --target-filters "{\"TargetStatus\":[\"Failed\"]}" \
             --query "targetIds[0]" \
             --output text)
+          echo "Failed target id: $FAILED_TARGET_ID"
           
           # 失敗理由をステップのアウトプットとして設定
           DEPLOYMENT_TARGET_DETAILS=$(aws deploy get-deployment-target \
