@@ -58,33 +58,33 @@ jobs:
           aws deploy wait deployment-successful --deployment-id ${{ steps.create-deployment.outputs.deployment_id }}
       
       - name: Get deployment info and output failure reasons
-  if: ${{ failure() }} # 前のステップが失敗した場合のみ実行される
-  run: |
-    DEPLOYMENT_INFO=$(aws deploy get-deployment --deployment-id ${{ steps.create-deployment.outputs.deployment_id }})
-    echo "$DEPLOYMENT_INFO"
-    
-    # JSONから失敗理由を抽出する（jqコマンドがインストールされている必要がある）
-    FAILURE_REASONS=$(echo "$DEPLOYMENT_INFO" | jq -r '.deploymentInfo.errorInformation')
-    echo "Failure reasons: $FAILURE_REASONS"
+        if: ${{ failure() }}
+        run: |
+          DEPLOYMENT_INFO=$(aws deploy get-deployment --deployment-id ${{ steps.create-deployment.outputs.deployment_id }})
+          echo "$DEPLOYMENT_INFO"
+          
+          # JSONから失敗理由を抽出する（jqコマンドがインストールされている必要がある）
+          FAILURE_REASONS=$(echo "$DEPLOYMENT_INFO" | jq -r '.deploymentInfo.errorInformation')
+          echo "Failure reasons: $FAILURE_REASONS"
 
-    FAILED_TARGET_ID=$(aws deploy list-deployment-targets \
-      --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
-      --target-filters "{\"TargetStatus\":[\"Failed\"]}" \
-      --query "targetIds[0]" \
-      --output text)
-    
-    # 失敗理由をステップのアウトプットとして設定
-    DEPLOYMENT_TARGET_DETAILS=$(aws deploy get-deployment-target \
-      --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
-      --target-id ${{ env.FAILED_TARGET_ID }})
-    FAILURE_REASON=$(echo "$DEPLOYMENT_TARGET_DETAILS" | jq -r '.deploymentTarget.instanceTarget.lifecycleEvents[] | select(.status == "Failed") | .diagnostics.message')
-    echo "Failure reason: $FAILURE_REASON"
-      
-  - name: Slack Notify
-    if: ${{ always() }}
-    uses: 8398a7/action-slack@v3
-    with:
-      status: ${{ job.status }}
-      fields: repo,commit,action,took,ref,author,workflow
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          FAILED_TARGET_ID=$(aws deploy list-deployment-targets \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
+            --target-filters "{\"TargetStatus\":[\"Failed\"]}" \
+            --query "targetIds[0]" \
+            --output text)
+          
+          # 失敗理由をステップのアウトプットとして設定
+          DEPLOYMENT_TARGET_DETAILS=$(aws deploy get-deployment-target \
+            --deployment-id ${{ steps.create-deployment.outputs.deployment_id }} \
+            --target-id ${{ env.FAILED_TARGET_ID }})
+          FAILURE_REASON=$(echo "$DEPLOYMENT_TARGET_DETAILS" | jq -r '.deploymentTarget.instanceTarget.lifecycleEvents[] | select(.status == "Failed") | .diagnostics.message')
+          echo "Failure reason: $FAILURE_REASON"
+            
+      - name: Slack Notify
+        if: ${{ always() }}
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,commit,action,took,ref,author,workflow
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
