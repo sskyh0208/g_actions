@@ -38,10 +38,10 @@ jobs:
         uses: actions/checkout@v3
 
       # アーカイブ用に必要ファイルをコピー
-      - name: Copy Requires Files
+      - name: Copy required files for deployment archive
         run: |
-          cp ./github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
-          cp -r ./github/scripts ${{ env.SRC_DIR }}/scripts
+          cp ./.github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
+          cp -r ./.github/scripts ${{ env.SRC_DIR }}/scripts
 
       # ODICによるAWS認証
       - name: Configure AWS Credentials
