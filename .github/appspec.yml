@@ -4,19 +4,19 @@ files:
   - source: /
     destination: /var/www/laravel
 hooks:
+  ApplicationStop:
+    - location: scripts/ApplicationStop.sh
+      timeout: 300
+      runas: root
   BeforeInstall:
-    - location: scripts/before_install.sh
+    - location: scripts/BeforeInstall.sh
       timeout: 300
       runas: root
   AfterInstall:
-    - location: scripts/after_install.sh
+    - location: scripts/AfterInstall.sh
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/application_start.sh
-      timeout: 300
-      runas: root
-  ApplicationStop:
-    - location: scripts/application_start.sh
+    - location: scripts/ApplicationStart.sh
       timeout: 300
       runas: root

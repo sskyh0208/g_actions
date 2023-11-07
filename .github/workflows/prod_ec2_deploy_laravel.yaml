@@ -33,6 +33,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # アーカイブ用に必要ファイルをコピー
+      - name: Copy Requires Files
+        run: |
+          cp ./github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
+          cp -r ./github/scripts ${{ env.SRC_DIR }}/scripts
+
       # ODICによるAWS認証
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
