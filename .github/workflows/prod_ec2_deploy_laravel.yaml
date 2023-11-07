@@ -37,8 +37,7 @@ jobs:
       - name: Copy required files for deployment archive
         run: |
           cp ./.github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
-          mkdir ${{ env.SRC_DIR }}/scripts
-          cp ./.github/scripts/* ${{ env.SRC_DIR }}/scripts/*
+          cp -r ./.github/scripts ${{ env.SRC_DIR }}/scripts
 
       # ODICによるAWS認証
       - name: Configure AWS Credentials
