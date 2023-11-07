@@ -39,7 +39,7 @@ jobs:
             --s3-location s3://${{ secrets.AWS_DEPLOY_SOURCE_BUCKET_NAME }}/${{ github.run_id }}.zip --no-ignore-hidden-files)
           echo "$OUTPUT"
           ETAG=$(echo "$OUTPUT" | grep -oP 'eTag=\K[^ ]+')
-          echo "::set-output name=etag::$ETAG"
+          echo "etag=$ETAG" >> $GITHUB_OUTPUT
 
       - name: Create deployment with AWS CodeDeploy
         run: |
