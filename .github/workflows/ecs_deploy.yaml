@@ -3,6 +3,11 @@ name: ecs deploy
 on:
   workflow_call:
     inputs:
+      env:
+        description: "environment"
+        required: true
+        default: prod
+        type: string
       secrets:
         AWS_ROLE_TO_ASSUME:
           required: true
