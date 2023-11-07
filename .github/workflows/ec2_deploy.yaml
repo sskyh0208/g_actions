@@ -56,13 +56,6 @@ jobs:
         id: wait-for-deployment
         run: |
           aws deploy wait deployment-successful --deployment-id ${{ steps.create-deployment.outputs.deployment_id }}
-        continue-on-error: true
-
-      - name: Check deployment status
-        if: ${{ failure() }}
-        run: |
-          echo "Deployment failed. Check AWS CodeDeploy for details."
-          exit 1
       
       - name: Slack Notify
         if: ${{ always() }}
