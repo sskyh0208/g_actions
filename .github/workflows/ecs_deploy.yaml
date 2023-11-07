@@ -20,11 +20,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          inline-session-policy: '{"Version":"2012-10-17","Statement":[{"Sid":"Stmt1","Effect":"Allow","Action":"s3:List*","Resource":"*"}]}'
           aws-region: ap-northeast-1
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: GitHubActions-${{ github.run_id }}
-          managed-session-policies: |
-            arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
       - name: Check S3 bucket list with the AWS CLI
         run: |
           aws s3 ls
