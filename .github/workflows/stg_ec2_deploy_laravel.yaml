@@ -37,12 +37,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # アーカイブ用に必要ファイルをコピー
-      - name: Copy required files for deployment archive
-        run: |
-          cp ./.github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
-          cp -r ./.github/scripts ${{ env.SRC_DIR }}/scripts
-
       # ODICによるAWS認証
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -62,10 +56,27 @@ jobs:
           sed -e 's/^"//' -e 's/"$//' -e 's/\\\"/\"/g' | \
           awk '{gsub(/\\n/,"\n")}1' > .env
 
+      - name: cache vendor
+        id: cache
+        uses: actions/cache@v1
+        with:
+          ref: main
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       # 依存関係のインストール
       - name: Install dependencies
         working-directory: ${{ env.SRC_DIR }}
+        if: steps.cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-interaction --optimize-autoloader
+
+      # アーカイブ用に必要ファイルをコピー
+      - name: Copy required files for deployment archive
+        run: |
+          cp ./.github/appspec.yml ${{ env.SRC_DIR }}/appspec.yml
+          cp -r ./.github/scripts ${{ env.SRC_DIR }}/scripts
 
       # ソースコードのアップロード
       - name: Deploy Laravel application to S3 and capture eTag
