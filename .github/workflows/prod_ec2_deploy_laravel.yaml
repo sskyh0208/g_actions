@@ -52,9 +52,9 @@ jobs:
           sed -e 's/^"//' -e 's/"$//' -e 's/\\\"/\"/g' | \
           awk '{gsub(/\\n/,"\n")}1' > .env
 
-      - name: cache vendor
+      - name: Cache vendor
         id: cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           ref: main
           path: ./vendor
