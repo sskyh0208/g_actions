@@ -55,6 +55,7 @@ jobs:
       - name: Cache vendor
         id: cache
         uses: actions/cache@v3
+        working-directory: ${{ env.SRC_DIR }}
         with:
           ref: main
           path: ./vendor
